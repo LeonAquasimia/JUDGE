@@ -21,7 +21,7 @@ public class OverlayTest extends Component
 
     public void draw(Camera camera, Shader shader, Entity entity)
     {
-        shader.update(camera,entity.transform(),material,true);
+        shader.update(camera,entity,material,true);
         mesh.render();
     }
 }

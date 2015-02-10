@@ -1,6 +1,8 @@
-package engine.core;
+package engine.rendering;
 
-import engine.entity.component.Camera;
+import engine.core.Theatre;
+import engine.entity.component.*;
+import engine.rendering.shader.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -9,20 +11,52 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Renderer
 {
+    static ForwardAmbientShader ambientShader;
+    static Shader currentShader;
+
     public static void render(Theatre theatre)
     {
         clearScreen();
 
+        if(ambientShader==null)
+        {
+            ambientShader=new ForwardAmbientShader();
+        }
+
         glEnable(GL_DEPTH_TEST);
         for(Camera camera:Camera.cameras)
         {
-            theatre.root.render(camera, theatre.shader);
+            ambientShader.bind(null);
+            theatre.root.render(camera,ambientShader);
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE,GL_ONE);
+            glDepthMask(false);
+            glDepthFunc(GL_EQUAL);
+
+            for(BaseLight light:theatre.environment().lights)
+            {
+                currentShader=light.shader();
+                currentShader.bind(light);
+
+                //System.out.println(currentShader);
+
+                theatre.root.render(camera,currentShader);
+            }
+
+            glDepthFunc(GL_LESS);
+            glDepthMask(true);
+            glDisable(GL_BLEND);
         }
+
+        /*
+
+        */
 
         glDisable(GL_DEPTH_TEST);
         for(Camera camera:Camera.cameras)
         {
-            theatre.root.draw(camera, theatre.shader);
+            theatre.root.draw(camera,theatre.shader);
         }
     }
 

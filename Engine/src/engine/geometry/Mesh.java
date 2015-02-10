@@ -33,7 +33,7 @@ public class Mesh
         return this;
 	}
 	
-	public void addVertices(ArrayList<Vertex> vertices,ArrayList<Integer> indices, boolean calcNormals)
+	public Mesh addVertices(ArrayList<Vertex> vertices,ArrayList<Integer> indices, boolean calcNormals)
 	{
 		size=indices.size();
 		
@@ -47,6 +47,8 @@ public class Mesh
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,Util.createFlippedBufferI(indices),GL_STATIC_DRAW);
+
+        return this;
 	}
 	
 	private void calcNormals(ArrayList<Vertex> vertices,ArrayList<Integer> indices)

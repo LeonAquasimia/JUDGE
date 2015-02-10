@@ -3,6 +3,7 @@ package engine.entity.component;
 import engine.entity.Entity;
 import engine.math.Matrix4;
 import engine.math.Vector3;
+import engine.rendering.Colour;
 
 import java.util.ArrayList;
 
@@ -185,4 +186,6 @@ public class Camera extends Component
     public void up(Vector3 up) {
         this.up = up;
     }
+
+
 }

@@ -1,6 +1,7 @@
 package engine.core;
 
 import engine.input.Input;
+import engine.rendering.Renderer;
 import engine.util.Time;
 
 public class Engine
@@ -8,7 +9,7 @@ public class Engine
 	private int width=800,height=600;
     private double frameTime=1.0/5000.0;
     private boolean isRunning;
-    private static Theatre theatre;
+    public static Theatre theatre;
     private String title="Engine";
 
     public Engine(String title,int width, int height,int frameCap,Theatre theatre)

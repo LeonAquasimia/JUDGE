@@ -2,13 +2,13 @@ package engine.core;
 
 import engine.entity.Entity;
 import engine.rendering.Environment;
+import engine.rendering.shader.ForwardAmbientShader;
 import engine.rendering.shader.Shader;
-import engine.rendering.shader.ShaderDefault;
-import engine.rendering.shader.ShaderNull;
+import engine.rendering.shader.NullShader;
 
 public class Theatre
 {
-	public Environment environment=new Environment();
+	private Environment environment=new Environment();
 
     protected Entity root;
     protected Shader shader;
@@ -21,9 +21,7 @@ public class Theatre
 
     public void init()
     {
-        shader=new ShaderNull();
-        shader.bind(environment);
-        root=new Entity();
+        root=new Entity(this);
         root.create();
     }
 
@@ -53,4 +51,13 @@ public class Theatre
 	{
         root.update(delta);
 	}
+
+    public Environment environment()
+    {
+        return environment;
+    }
+
+    public void environment(Environment environment) {
+        this.environment = environment;
+    }
 }

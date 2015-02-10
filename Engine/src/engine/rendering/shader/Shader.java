@@ -1,17 +1,12 @@
 package engine.rendering.shader;
 
-import engine.core.Transform;
+import engine.entity.Entity;
+import engine.entity.component.*;
 import engine.math.Matrix4;
 import engine.math.Vector2;
 import engine.math.Vector3;
-import engine.entity.component.Camera;
 import engine.rendering.Colour;
-import engine.rendering.Environment;
 import engine.rendering.Material;
-import engine.rendering.lighting.BaseLight;
-import engine.rendering.lighting.DirectionLight;
-import engine.rendering.lighting.PointLight;
-import engine.rendering.lighting.SpotLight;
 import engine.util.Util;
 
 import java.io.BufferedReader;
@@ -26,7 +21,7 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 public abstract class Shader
 {
     public static Shader instance;
-    protected static Environment environment;
+    public BaseLight light;
 
     private int program;
     private HashMap<String, Integer> uniformMap = new HashMap<String, Integer>();
@@ -36,20 +31,21 @@ public abstract class Shader
     {
         program = glCreateProgram();
 
-        if (program == 0) {
+        if (program == 0)
+        {
             System.err.println("Shader's fucked.");
             System.exit(1);
         }
     }
 
-    public void bind(Environment environment)
+    public void bind(BaseLight light)
     {
+        this.light=light;
         instance=this;
-        Shader.environment=environment;
         glUseProgram(program);
     }
 
-    public void update(Camera camera,Transform transform,Material material,boolean orthogonal)
+    public void update(Camera camera,Entity entity,Material material,boolean orthogonal)
     {
 
     }
@@ -100,48 +96,36 @@ public abstract class Shader
 	
 	public void setUniform(String uniform,Matrix4 value)
 	{
-		glUniformMatrix4(uniformMap.get(uniform),true,Util.createFlippedBufferM(value));		
+		glUniformMatrix4(uniformMap.get(uniform), true, Util.createFlippedBufferM(value));
 	}
 
-    public void setUniform(String uniform,BaseLight baseLights)
+    public void setUniform(String uniform,BaseLight baseLight)
     {
-        setUniform(uniform + ".intensity", baseLights.intensity());
-        setUniform(uniform + ".colour", baseLights.colour());
+        setUniform(uniform + ".intensity", baseLight.intensity());
+        setUniform(uniform + ".colour", baseLight.colour());
     }
 
-    public void setUniform(String uniform,DirectionLight... directionLights)
+    public void setUniform(String uniform,DirectionLight directionLight)
     {
-        for(int i=0;i<directionLights.length;i+=1)
-        {
-            setUniform(uniform +"["+i+"]" + ".base", directionLights[i].base());
-            setUniform(uniform +"["+i+"]" + ".direction", directionLights[i].direction());
-        }
+        setUniform(uniform+".base",(BaseLight)directionLight);
+        setUniform(uniform+".direction", directionLight.direction());
     }
 
-    public void setUniform(String uniform,PointLight... pointLights)
+    public void setUniform(String uniform,PointLight pointLight)
     {
-        for(int i=0;i<pointLights.length;i+=1)
-        {
-            //System.out.println(pointLights[i].base());
-            setUniform(uniform + "[" + i + "]" + ".base", pointLights[i].base());
-            setUniform(uniform +"["+i+"]" + ".attenuation", pointLights[i].attenuation());
-            setUniform(uniform +"["+i+"]" + ".position", pointLights[i].position());
-            setUniform(uniform + "[" + i + "]" + ".range", pointLights[i].range());
-        }
+        setUniform(uniform + ".base",(BaseLight)pointLight);
+        setUniform(uniform+".attenuation", pointLight.attenuation());
+        setUniform(uniform+".position", pointLight.position());
+        setUniform(uniform+".range", pointLight.range());
     }
 
-    public void setUniform(String uniform,SpotLight... spotLights)
+    public void setUniform(String uniform,SpotLight spotLight)
     {
-        for(int i=0;i<spotLights.length;i+=1)
-        {
-            //System.out.println( spotLights[i].point());
-            setUniform(uniform + "[" + i + "]" + ".point.base", spotLights[i].point().base());
-            setUniform(uniform +"["+i+"]" + ".point.attenuation", spotLights[i].point().attenuation());
-            setUniform(uniform +"["+i+"]" + ".point.position", spotLights[i].point().position());
-            setUniform(uniform + "[" + i + "]" + ".point.range", spotLights[i].point().range());
-            setUniform(uniform +"["+i+"]" + ".direction", spotLights[i].direction());
-            setUniform(uniform +"["+i+"]" + ".cutOff", spotLights[i].cutOff());
-        }
+        setUniform(uniform+".point",(PointLight)spotLight);
+        //setUniform(uniform+".point.attenuation", spotLights[i].point().attenuation());
+        //setUniform(uniform+".point.range", spotLights[i].point().range());
+        setUniform(uniform+".direction",spotLight.direction());
+        setUniform(uniform+".cutOff",spotLight.cutOff());
     }
 	
 	public void addGeometryShader(String string)

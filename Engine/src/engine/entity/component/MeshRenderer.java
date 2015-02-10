@@ -18,7 +18,7 @@ public class MeshRenderer extends Component
 
     public void render(Camera camera, Shader shader, Entity entity)
     {
-        shader.update(camera,entity.transform(),material,false);
+        shader.update(camera,entity,material,false);
         mesh.render();
     }
 }

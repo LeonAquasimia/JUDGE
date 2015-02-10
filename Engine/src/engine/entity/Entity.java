@@ -1,5 +1,6 @@
 package engine.entity;
 
+import engine.core.Theatre;
 import engine.core.Transform;
 import engine.entity.component.Component;
 import engine.entity.component.Camera;
@@ -13,6 +14,8 @@ public class Entity
     private ArrayList<Component> components;
     private Entity parent=null;
     private Transform transform;
+    private Theatre theatre;
+    private boolean created=false;
 
     public Entity()
     {
@@ -21,9 +24,16 @@ public class Entity
         transform=new Transform();
     }
 
+    public Entity(Theatre theatre)
+    {
+        this();
+        this.theatre=theatre;
+    }
+
     public Entity addChild(Entity child)
     {
         child.parent=this;
+        child.theatre=theatre;
         children.add(child);
 
         return this;
@@ -43,6 +53,9 @@ public class Entity
     {
         component.entity=this;
         components.add(component);
+
+        if(created)
+        component.create(this);
 
         return this;
     }
@@ -67,8 +80,20 @@ public class Entity
         this.transform = transform;
     }
 
+    public Theatre theatre()
+    {
+        return theatre;
+    }
+
+    public void theatre(Theatre theatre)
+    {
+        this.theatre = theatre;
+    }
+
     public void create()
     {
+        created=true;
+
         for(Component component:components)
         {
             component.create(this);
